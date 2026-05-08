@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathQuest 2º - Colegio Alborada</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #f43f5e;
+            --bg: #f1f5f9;
+            --accent: #10b981;
+            --dark: #1e293b;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Pantalla de Inicio / Menú */
+        #menu-inicial {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        #menu-inicial h1 { color: var(--dark); margin-bottom: 10px; }
+        .subtitle { color: #64748b; margin-bottom: 30px; font-weight: bold; }
+
+        .select-personalizado {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid var(--primary);
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .btn-empezar {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .btn-empezar:hover { transform: scale(1.02); }
+
+        /* Contenedor de Juego */
+        #game-wrapper {
+            display: none;
+            grid-template-columns: 1fr 320px;
+            gap: 25px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .main-panel {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #enunciado {
+            font-size: 1.6em;
+            line-height: 1.6;
+            color: #334155;
+            margin-bottom: 40px;
+            min-height: 150px;
+        }
+
+        .answer-zone { display: flex; gap: 15px; }
+
+        input[type="number"] {
+            width: 140px;
+            padding: 18px;
+            font-size: 1.8em;
+            border: 3px solid #cbd5e1;
+            border-radius: 15px;
+            outline: none;
+        }
+
+        .btn-check {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3em;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Calculadora */
+        .calc-panel {
+            background: var(--dark);
+            padding: 25px;
+            border-radius: 25px;
+            color: white;
+            border: 4px solid var(--secondary);
+        }
+
+        .calc-panel.unlocked { border-color: var(--accent); }
+
+        .calc-screen {
+            background: #0f172a;
+            padding: 20px;
+            text-align: right;
+            font-family: monospace;
+            font-size: 1.4em;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            min-height: 35px;
+            color: #10b981;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .calc-btn {
+            background: #334155;
+            border: none;
+            color: white;
+            padding: 18px 5px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+
+        .calc-btn.op { background: #f59e0b; }
+
+        #feedback { margin-top: 25px; font-weight: bold; font-size: 1.3em; height: 30px; }
+
+        .footer-controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1000px;
+            color: #64748b;
+            font-size: 0.9em;
+        }
+
+        .btn-volver {
+            background: none;
+            border: 1px solid #cbd5e1;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        @media (max-width: 850px) {
+            #game-wrapper { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="menu-inicial">
+        <h1>📐 MathQuest 2º</h1>
+        <div class="subtitle">Colegio Alborada</div>
+        <p>Selecciona una categoría para comenzar:</p>
+        <select id="selector-categoria" class="select-personalizado">
+            <option value="aleatorio">🎲 Todo mezclado</option>
+            <option value="Suma sin llevada">➕ Sumas sin llevada</option>
+            <option value="Suma con llevada">🚀 Sumas con llevada</option>
+            <option value="Resta sin llevada">➖ Restas sin llevada</option>
+            <option value="Resta con llevada">📉 Restas con llevada</option>
+            <option value="Suma y resta llevando">🔄 Suma y Resta combinada</option>
+            <option value="Multiplicar">✖️ Tablas de multiplicar</option>
+        </select>
+        <button class="btn-empezar" onclick="iniciarJuego()">¡Empezar Reto!</button>
+    </div>
+
+    <div id="game-wrapper">
+        <div class="main-panel">
+            <div id="enunciado">Cargando problema...</div>
+            <div class="answer-zone">
+                <input type="number" id="respuesta-usuario" placeholder="?" autocomplete="off">
+                <button class="btn-check" onclick="verificarRespuesta()">Comprobar</button>
+            </div>
+            <div id="feedback"></div>
+            <div style="margin-top:20px;">Puntos acumulados: <strong id="puntos" style="color:var(--primary)">0</strong></div>
+        </div>
+
+        <div id="calc-panel" class="calc-panel">
+            <div style="font-size:0.7em; margin-bottom:10px; display:flex; justify-content:space-between">
+                <span>BLOQUE DE APOYO</span>
+                <span id="lock-status">🔒</span>
+            </div>
+            <div id="calc-display" class="calc-screen">Introduce PIN</div>
+            <div class="calc-grid">
+                <button class="calc-btn" style="grid-column: span 2; background:#ef4444" onclick="clearCalc()">C</button>
+                <button class="calc-btn op" onclick="addCalc('/')">÷</button>
+                <button class="calc-btn op" onclick="addCalc('*')">×</button>
+                <button class="calc-btn" onclick="addCalc('7')">7</button>
+                <button class="calc-btn" onclick="addCalc('8')">8</button>
+                <button class="calc-btn" onclick="addCalc('9')">9</button>
+                <button class="calc-btn op" onclick="addCalc('-')">-</button>
+                <button class="calc-btn" onclick="addCalc('4')">4</button>
+                <button class="calc-btn" onclick="addCalc('5')">5</button>
+                <button class="calc-btn" onclick="addCalc('6')">6</button>
+                <button class="calc-btn op" onclick="addCalc('+')">+</button>
+                <button class="calc-btn" onclick="addCalc('1')">1</button>
+                <button class="calc-btn" onclick="addCalc('2')">2</button>
+                <button class="calc-btn" onclick="addCalc('3')">3</button>
+                <button class="calc-btn op" style="background:var(--accent)" onclick="solveCalc()">=</button>
+                <button class="calc-btn" style="grid-column: span 3" onclick="addCalc('0')">0</button>
+                <button class="calc-btn" onclick="addCalc('.')">.</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-juego" class="footer-controls" style="display: none;">
+        <button class="btn-volver" onclick="volverAlMenu()">⬅ Cambiar categoría</button>
+        <strong>ESR | Colegio Alborada</strong>
+    </div>
+
+<script>
+    let puntos = 0;
+    let respuestaCorrecta;
+    let desbloqueada = false;
+    let pinIntento = "";
+    let categoriaActual = "";
+    const PIN_SECRETO = "2026";
+
+    const nombres = ["Hugo", "Sofía", "Mateo", "Lucía", "Leo", "Martina", "Daniela", "Álvaro", "Emma"];
+    const cosas = ["canicas", "pegatinas", "manzanas", "caramelos", "lápices", "pinturas", "bombones"];
+
+    function iniciarJuego() {
+        categoriaActual = document.getElementById('selector-categoria').value;
+        document.getElementById('menu-inicial').style.display = 'none';
+        document.getElementById('game-wrapper').style.display = 'grid';
+        document.getElementById('footer-juego').style.display = 'flex';
+        generarProblema();
+    }
+
+    function volverAlMenu() {
+        document.getElementById('menu-inicial').style.display = 'block';
+        document.getElementById('game-wrapper').style.display = 'none';
+        document.getElementById('footer-juego').style.display = 'none';
+    }
+
+    function generarProblema() {
+        let cat = categoriaActual;
+        if (cat === "aleatorio") {
+            const opciones = ["Suma sin llevada", "Suma con llevada", "Resta sin llevada", "Resta con llevada", "Suma y resta llevando", "Multiplicar"];
+            cat = opciones[Math.floor(Math.random() * opciones.length)];
+        }
+
+        document.getElementById('respuesta-usuario').value = "";
+        document.getElementById('respuesta-usuario').focus();
+        document.getElementById('feedback').innerText = "";
+
+        let a, b, c, texto;
+        const n1 = nombres[Math.floor(Math.random() * nombres.length)];
+        const n2 = nombres[Math.floor(Math.random() * nombres.length)];
+        const o = cosas[Math.floor(Math.random() * cosas.length)];
+
+        do {
+            if (cat === 'Suma sin llevada') {
+                a = Math.floor(Math.random() * 40) + 11;
+                b = Math.floor(Math.random() * 40) + 11;
+                while ((a % 10 + b % 10) > 9) b--;
+                respuestaCorrecta = a + b;
+                texto = `${n1} tiene ${a} ${o} y su profe le da otras ${b}. ¿Cuántas ${o} tiene ahora ${n1} en total?`;
+            } else if (cat === 'Suma con llevada') {
+                a = Math.floor(Math.random() * 35) + 20;
+                b = Math.floor(Math.random() * 35) + 20;
+                while ((a % 10 + b % 10) < 10) b++;
+                respuestaCorrecta = a + b;
+                texto = `En el comedor había ${a} ${o} y han traído ${b} más. ¿Cuántas ${o} hay ahora en total?`;
+            } else if (cat === 'Resta sin llevada') {
+                a = Math.floor(Math.random() * 40) + 55;
+                b = Math.floor(Math.random() * 40) + 10;
+                while (a % 10 < b % 10) b--;
+                respuestaCorrecta = a - b;
+                texto = `${n1} trajo al cole ${a} ${o}, pero ha repartido ${b} con ${n2}. ¿Cuántas ${o} le quedan?`;
+            } else if (cat === 'Resta con llevada') {
+                a = Math.floor(Math.random() * 40) + 45;
+                b = Math.floor(Math.random() * 25) + 16;
+                while (a % 10 >= b % 10) b++;
+                respuestaCorrecta = a - b;
+                texto = `Teníamos ${a} ${o} para plástica, pero ya se han usado ${b}. ¿Cuántas ${o} nos quedan disponibles?`;
+            } else if (cat === 'Suma y resta llevando') {
+                a = 40; b = 25; c = 18;
+                respuestaCorrecta = a + b - c;
+                texto = `${n1} tiene ${a} ${o}. En el recreo gana ${b}, pero luego pierde ${c}. ¿Con cuántas ${o} termina el día?`;
+            } else {
+                a = Math.floor(Math.random() * 7) + 3;
+                b = Math.floor(Math.random() * 8) + 2;
+                respuestaCorrecta = a * b;
+                texto = `En clase hay ${a} filas y en cada fila hay ${b} niños con sus ${o}. ¿Cuántas ${o} hay en total?`;
+            }
+        } while (respuestaCorrecta == 2026);
+
+        document.getElementById('enunciado').innerText = texto;
+    }
+
+    function verificarRespuesta() {
+        const input = document.getElementById('respuesta-usuario');
+        if (parseInt(input.value) === respuestaCorrecta) {
+            puntos += 10;
+            document.getElementById('puntos').innerText = puntos;
+            document.getElementById('feedback').innerText = "¡Muy bien hecho! 🌟";
+            document.getElementById('feedback').style.color = "var(--accent)";
+            setTimeout(generarProblema, 1500);
+        } else {
+            document.getElementById('feedback').innerText = "¡Sigue intentándolo! 💪";
+            document.getElementById('feedback').style.color = "var(--secondary)";
+        }
+    }
+
+    let calcVal = "";
+    function addCalc(v) {
+        if (!desbloqueada) {
+            pinIntento += v;
+            document.getElementById('calc-display').innerText = "*".repeat(pinIntento.length);
+            if (pinIntento === PIN_SECRETO) {
+                desbloqueada = true;
+                const panel = document.getElementById('calc-panel');
+                panel.classList.add('unlocked');
+                document.getElementById('lock-status').innerText = "OK ✅";
+                document.getElementById('calc-display').innerText = "0";
+                calcVal = "";
+            } else if (pinIntento.length >= 4) {
+                pinIntento = "";
+                document.getElementById('calc-display').innerText = "ERROR PIN";
+            }
+            return;
+        }
+        calcVal += v;
+        document.getElementById('calc-display').innerText = calcVal;
+    }
+
+    function solveCalc() {
+        if (!desbloqueada) return;
+        try {
+            calcVal = eval(calcVal).toString();
+            document.getElementById('calc-display').innerText = calcVal;
+        } catch { clearCalc(); }
+    }
+
+    function clearCalc() {
+        calcVal = ""; pinIntento = "";
+        document.getElementById('calc-display').innerText = desbloqueada ? "0" : "Introduce PIN";
+    }
+
+    document.getElementById('respuesta-usuario').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') verificarRespuesta();
+    });
+</script>
+
+</body>
+</html>
